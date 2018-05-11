@@ -84,10 +84,13 @@ apt-key fingerprint 0EBFCD88
 add-apt-repository 'deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable'
 apt-get update
 apt-get install docker-ce -y
-mkdir /home/ubuntu/docker
-apt-get install nfs-kernel-server nfs-common -y
-mount ${EXTERNAL_NET_HOST_IP}:$dir/docker /home/ubuntu/docker
+mount /dev/cdrom /mnt
+cp -r /mnt/docker /home/ubuntu
+umount /dev/cdrom
 docker run -d -v /home/ubuntu/docker/etc/:/etc/nginx/conf.d -v /home/ubuntu/docker/certs:/etc/ssl/certs -v ${NGINX_LOG_DIR}:/var/log/nginx -p ${NGINX_PORT}:443 ${NGINX_IMAGE}" > $dir/config-drives/vm1-config/user-data
+
+#mkdir /home/ubuntu/docker
+#apt-get install nfs-kernel-server nfs-common -y
 
 #VM2-config
 #meta-data
@@ -133,13 +136,14 @@ virsh net-start internal
 virsh net-start management
 
 #Download image and create disks
-wget -O /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 ${VM_BASE_IMAGE}
+#wget -O /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 ${VM_BASE_IMAGE}
 mkdir /var/lib/libvirt/images/vm1
 mkdir /var/lib/libvirt/images/vm2
 cp /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 /var/lib/libvirt/images/vm1/vm1.qcow2
 cp /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 /var/lib/libvirt/images/vm2/vm2.qcow2
 
 #Create iso conf drive
+cp -r $dir/docker $dir/config-drives/vm1-config
 mkisofs -o "/var/lib/libvirt/images/vm1/config-vm1.iso" -V cidata -r -J $dir/config-drives/vm1-config
 mkisofs -o "/var/lib/libvirt/images/vm2/config-vm2.iso" -V cidata -r -J $dir/config-drives/vm2-config
 
@@ -155,9 +159,9 @@ echo "server {
 }" > $dir/docker/etc/nginx.conf
 
 #NFS
-apt-get install nfs-kernel-server nfs-common -y
-echo "$dir/docker ${VM1_EXTERNAL_IP}(ro,sync,no_subtree_check)" > /etc/exports
-service nfs-kernel-server restart
+#apt-get install nfs-kernel-server nfs-common -y
+#echo "$dir/docker ${VM1_EXTERNAL_IP}(ro,sync,no_subtree_check)" > /etc/exports
+#service nfs-kernel-server restart
 
 #Install VM1
 virt-install --connect qemu:///system \

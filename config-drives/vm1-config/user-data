@@ -10,7 +10,7 @@ apt-key fingerprint 0EBFCD88
 add-apt-repository 'deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable'
 apt-get update
 apt-get install docker-ce -y
-mkdir /home/ubuntu/docker
-apt-get install nfs-kernel-server nfs-common -y
-mount 192.168.123.1:/home/user/task10_12_3/docker /home/ubuntu/docker
+mount /dev/cdrom /mnt
+cp -r /mnt/docker /home/ubuntu
+umount /dev/cdrom
 docker run -d -v /home/ubuntu/docker/etc/:/etc/nginx/conf.d -v /home/ubuntu/docker/certs:/etc/ssl/certs -v /srv/log/nginx:/var/log/nginx -p 17080:443 nginx:1.13
