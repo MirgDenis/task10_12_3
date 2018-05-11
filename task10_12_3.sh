@@ -89,9 +89,6 @@ cp -r /mnt/docker /home/ubuntu
 umount /dev/cdrom
 docker run -d -v /home/ubuntu/docker/etc/:/etc/nginx/conf.d -v /home/ubuntu/docker/certs:/etc/ssl/certs -v ${NGINX_LOG_DIR}:/var/log/nginx -p ${NGINX_PORT}:443 ${NGINX_IMAGE}" > $dir/config-drives/vm1-config/user-data
 
-#mkdir /home/ubuntu/docker
-#apt-get install nfs-kernel-server nfs-common -y
-
 #VM2-config
 #meta-data
 echo "instance-id: vm2-123
@@ -136,7 +133,7 @@ virsh net-start internal
 virsh net-start management
 
 #Download image and create disks
-#wget -O /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 ${VM_BASE_IMAGE}
+wget -O /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 ${VM_BASE_IMAGE}
 mkdir /var/lib/libvirt/images/vm1
 mkdir /var/lib/libvirt/images/vm2
 cp /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 /var/lib/libvirt/images/vm1/vm1.qcow2
@@ -157,11 +154,6 @@ echo "server {
                 proxy_pass http://${VM2_VXLAN_IP}:${APACHE_PORT};
 }
 }" > $dir/docker/etc/nginx.conf
-
-#NFS
-#apt-get install nfs-kernel-server nfs-common -y
-#echo "$dir/docker ${VM1_EXTERNAL_IP}(ro,sync,no_subtree_check)" > /etc/exports
-#service nfs-kernel-server restart
 
 #Install VM1
 virt-install --connect qemu:///system \
