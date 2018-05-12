@@ -4,11 +4,11 @@ source "$dir/config"
 
 #Create certs
 mkdir $dir/docker/certs
-openssl genrsa -out $dir/docker/certs/root-ca.key 2048
+openssl genrsa -out $dir/docker/certs/root.key 2048
 openssl req -x509 -new\
-        -key $dir/docker/certs/root-ca.key\
+        -key $dir/docker/certs/root.key\
         -days 365\
-        -out $dir/docker/certs/root-ca.crt\
+        -out $dir/docker/certs/root.crt\
         -subj '/C=UA/ST=Kharkiv/L=Kharkiv/O=NURE/OU=Mirantis/CN=rootCA'
 
 openssl genrsa -out $dir/docker/certs/web.key 2048
@@ -18,9 +18,9 @@ openssl req -new\
         -out $dir/docker/certs/web.csr\
         -subj "/C=UA/ST=Kharkiv/L=Karkiv/O=NURE/OU=Mirantis/CN=$(hostname -f)"
 
-openssl x509 -req -extfile <(printf "subjectAltName=IP:${VM1_EXTERNAL_IP},DNS:${VM1_NAME}") -days 365 -in $dir/docker/certs/web.csr -CA $dir/docker/certs/root-ca.crt -CAkey $dir/docker/certs/root-ca.key -CAcreateserial -out $dir/docker/certs/web.crt
+openssl x509 -req -extfile <(printf "subjectAltName=IP:${VM1_EXTERNAL_IP},DNS:${VM1_NAME}") -days 365 -in $dir/docker/certs/web.csr -CA $dir/docker/certs/root.crt -CAkey $dir/docker/certs/root.key -CAcreateserial -out $dir/docker/certs/web.crt
 
-cat $dir/docker/certs/web.crt $dir/docker/certs/root-ca.crt > $dir/docker/certs/web-bundle.crt
+cat $dir/docker/certs/web.crt $dir/docker/certs/root.crt > $dir/docker/certs/web-bundle.crt
 
 #Make directory for logs
 mkdir -p $NGINX_LOG_DIR
@@ -133,7 +133,7 @@ virsh net-start internal
 virsh net-start management
 
 #Download image and create disks
-wget -O /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 ${VM_BASE_IMAGE}
+#wget -O /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 ${VM_BASE_IMAGE}
 mkdir /var/lib/libvirt/images/vm1
 mkdir /var/lib/libvirt/images/vm2
 cp /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 /var/lib/libvirt/images/vm1/vm1.qcow2
