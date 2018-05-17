@@ -133,7 +133,7 @@ virsh net-start internal
 virsh net-start management
 
 #Download image and create disks
-#wget -O /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 ${VM_BASE_IMAGE}
+wget -O /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 ${VM_BASE_IMAGE}
 mkdir /var/lib/libvirt/images/vm1
 mkdir /var/lib/libvirt/images/vm2
 cp /var/lib/libvirt/images/ubuntu-server-16.04.qcow2 /var/lib/libvirt/images/vm1/vm1.qcow2
